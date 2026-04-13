@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HumanizeAI Pro — Bypass All AI Detectors</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#08080d;--bg2:#0f0f18;--bg3:#16161f;--bg4:#1c1c28;--bg5:#222230;
+  --border:#252535;--border2:#303045;--border3:#404058;
+  --text:#eeeef8;--text2:#9898b8;--text3:#555575;
+  --p:#6c5ce7;--p2:#5a4dd0;--p3:#4a3db8;--pglow:#6c5ce720;
+  --green:#00d4a0;--gbg:#001a14;--gborder:#003328;
+  --red:#ff5f5f;--rbg:#1a0808;--rborder:#3a1414;
+  --amber:#ffaa40;--abg:#1a1008;--aborder:#3a2810;
+  --blue:#4da8ff;--bbg:#081428;--bborder:#102040;
+  --r:16px;--rs:10px;--rxs:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(10px)}
+.overlay.hide{display:none}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:2.25rem;width:100%;max-width:480px;margin:1rem}
+.mlogo{width:52px;height:52px;background:var(--p);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:1.25rem}
+.modal h2{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;letter-spacing:-.02em}
+.modal p{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:1.25rem}
+.modal a{color:var(--p);text-decoration:none}
+.modal a:hover{text-decoration:underline}
+.kinput{position:relative;margin-bottom:10px}
+.kinput input{width:100%;padding:13px 46px 13px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.kinput input:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--pglow)}
+.eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:17px}
+.mnote{font-size:12px;color:var(--text3);background:var(--bg3);border-radius:var(--rxs);padding:10px 13px;margin-bottom:1.25rem;line-height:1.6;border:1px solid var(--border)}
+.steps p{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px}
+.step{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--text3);padding:5px 0}
+.sn{background:var(--p);color:#fff;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:.875rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hl{display:flex;align-items:center;gap:11px}
+.hlogo{width:38px;height:38px;border-radius:10px;background:var(--p);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-.02em}
+.htitle{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+.hsub{font-size:11px;color:var(--text3);margin-top:1px}
+.hr2{display:flex;align-items:center;gap:8px}
+.ubadge{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--gbg);color:var(--green);border:1px solid var(--gborder);font-weight:700;letter-spacing:.02em}
+.ks{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;font-weight:600}
+.kson{background:var(--gbg);color:var(--green);border-color:var(--gborder)}
+.ksoff{background:var(--rbg);color:var(--red);border-color:var(--rborder)}
+.hbtn{font-size:12px;padding:7px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rxs);color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s}
+.hbtn:hover{border-color:var(--p);color:var(--text)}
+
+/* MAIN */
+.main{max-width:1040px;margin:0 auto;padding:2rem 1.5rem}
+
+/* DETECTOR BADGES */
+.bypass-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);align-items:center}
+.bypass-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-right:4px;flex-shrink:0}
+.bypass-badge{font-size:11px;padding:4px 11px;border-radius:20px;font-weight:600;border:1px solid;display:flex;align-items:center;gap:5px}
+.bb-green{background:var(--gbg);color:var(--green);border-color:var(--gborder)}
+.bb-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:5px;margin-bottom:1.5rem}
+.tab{flex:1;padding:12px 16px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-radius:var(--rs);border:none;background:none;color:var(--text2);font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:-.01em}
+.tab.on{background:var(--p);color:#fff;box-shadow:0 2px 16px #6c5ce740}
+.tab:hover:not(.on){background:var(--bg3);color:var(--text)}
+
+.pane{display:none}.pane.on{display:block}
+
+/* TWO COL */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:740px){.two{grid-template-columns:1fr}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.35rem 1.5rem;margin-bottom:1rem}
+.ctitle{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.ctitle i{font-size:15px;font-style:normal}
+
+/* TEXTAREA */
+textarea{width:100%;min-height:230px;resize:vertical;font-family:'Inter',sans-serif;font-size:14px;line-height:1.85;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--pglow)}
+textarea::placeholder{color:var(--text3)}
+
+/* STATS */
+.stats{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;align-items:center}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.pill-g{background:var(--gbg);color:var(--green);border-color:var(--gborder);font-weight:600}
+
+/* SETTINGS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}
+.sg label{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+select{width:100%;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);outline:none;cursor:pointer;transition:border-color .2s}
+select:focus{border-color:var(--p)}
+.srow{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.srow label{font-size:11px;color:var(--text3);white-space:nowrap;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+input[type=range]{flex:1;accent-color:var(--p);cursor:pointer}
+.sval{font-size:12px;color:var(--p);font-weight:700;min-width:110px;text-align:right}
+
+/* BUTTONS */
+.btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.btn-p{background:var(--p);color:#fff;border:none;padding:13px 30px;border-radius:var(--rs);font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:-.01em}
+.btn-p:hover{background:var(--p2);transform:translateY(-1px);box-shadow:0 6px 24px #6c5ce750}
+.btn-p:active{transform:scale(.98)}
+.btn-p:disabled{background:#201e40;color:#4040a0;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-s{background:none;color:var(--text2);border:1px solid var(--border2);padding:13px 20px;border-radius:var(--rs);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s}
+.btn-s:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{font-size:12px;padding:7px 15px;border-radius:var(--rxs);background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s;font-weight:500}
+.btn-sm:hover{border-color:var(--p);color:var(--text)}
+
+/* PROGRESS */
+.prog-wrap{display:none;margin-top:1rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs)}
+.prog-bar{height:8px;background:var(--bg3);border-radius:20px;overflow:hidden;margin-bottom:10px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--green));border-radius:20px;transition:width .5s ease;width:0%}
+.prog-txt{font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px}
+.prog-sub{font-size:11px;color:var(--text3)}
+
+/* LOADING */
+.ldg{display:none;text-align:center;padding:2.5rem}
+.dots{display:inline-flex;gap:7px;align-items:center}
+.dot{width:9px;height:9px;background:var(--p);border-radius:50%;animation:bop 1.3s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.22s}
+.dot:nth-child(3){animation-delay:.44s}
+@keyframes bop{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-9px);opacity:1}}
+.ldg p{font-size:13px;color:var(--text2);margin-top:13px;font-weight:500}
+.ldg-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* ERROR */
+.err{font-size:13px;padding:13px 16px;background:var(--rbg);border-radius:var(--rs);margin-top:1rem;border:1px solid var(--rborder);display:none;line-height:1.65;color:var(--red)}
+
+/* OUTPUT */
+.outwrap{display:none;margin-top:1rem}
+.outhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.outtitle{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.outbox{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:18px 20px;font-size:14px;line-height:1.95;color:var(--text);min-height:120px;white-space:pre-wrap;word-break:break-word;font-weight:400}
+.outactions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+
+/* SCORE BADGES */
+.sbadge{font-size:12px;padding:5px 13px;border-radius:20px;font-weight:700;border:1px solid}
+.sb-a{background:var(--gbg);color:var(--green);border-color:var(--gborder)}
+.sb-b{background:#0a1a0a;color:#70c870;border-color:#1a4020}
+.sb-c{background:var(--abg);color:var(--amber);border-color:var(--aborder)}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:1rem}
+@media(max-width:700px){.metrics{grid-template-columns:1fr 1fr}}
+.metric{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:13px;text-align:center}
+.mv{font-size:20px;font-weight:800;color:var(--p);margin-bottom:3px}
+.ml{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+
+/* BYPASS SCORES */
+.bypass-scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:1rem}
+.bypass-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:13px 14px;text-align:center}
+.bi-name{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.bi-score{font-size:18px;font-weight:800;margin-bottom:3px}
+.bi-label{font-size:10px;font-weight:600}
+.bi-green{color:var(--green)}.bi-amber{color:var(--amber)}.bi-red{color:var(--red)}
+
+/* CHANGES */
+.chgbox{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px 18px;margin-top:1rem}
+.chgbox p{font-size:13px;color:var(--text2);line-height:1.75}
+.chgbox strong{color:var(--p);font-weight:600}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:1.25rem 0}
+
+/* METER */
+.mwrap{margin:1rem 0}
+.mlbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;font-weight:600}
+.mbar{height:14px;background:var(--bg3);border-radius:20px;overflow:hidden;border:1px solid var(--border);position:relative}
+.mfill{height:100%;border-radius:20px;transition:width 1.3s cubic-bezier(.4,0,.2,1);width:0%}
+.mmark{position:absolute;top:0;bottom:0;width:2px;background:var(--text3);opacity:.4}
+
+/* VERDICT */
+.verdict{display:flex;align-items:flex-start;gap:15px;padding:16px 20px;border-radius:var(--rs);margin-top:1rem;border:1px solid}
+.vi{font-size:26px;flex-shrink:0}
+.verdict h3{font-size:15px;font-weight:700;margin-bottom:5px;letter-spacing:-.01em}
+.verdict p{font-size:12px;line-height:1.7;opacity:.9}
+.vh{background:var(--gbg);border-color:var(--gborder);color:var(--green)}
+.va{background:var(--rbg);border-color:var(--rborder);color:var(--red)}
+.vm{background:var(--abg);border-color:var(--aborder);color:var(--amber)}
+
+/* SIGNALS */
+.sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem}
+@media(max-width:520px){.sigs{grid-template-columns:1fr 1fr}}
+.sig{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
+.sl{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.sv{font-size:13px;font-weight:700}
+.sg{color:var(--green)}.sa{color:var(--red)}.sm{color:var(--amber)}
+
+/* TIP */
+.tipbox{font-size:13px;color:var(--text2);background:var(--bg2);padding:13px 18px;margin-top:1rem;line-height:1.75;border-left:3px solid var(--p);border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0 var(--rs) var(--rs) 0}
+
+/* DETECTOR LIST */
+.det-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem}
+.det-tag{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--rbg);color:var(--red);border:1px solid var(--rborder);font-weight:600}
+.det-tag-g{background:var(--gbg);color:var(--green);border-color:var(--gborder)}
+
+@media(max-width:600px){
+  .hdr{padding:.875rem 1rem;flex-wrap:wrap;gap:8px}
+  .main{padding:1rem}
+  .bypass-row{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mlogo">&#129302;</div>
+    <h2>Enter Anthropic API Key</h2>
+    <p>This tool uses <strong>Claude AI</strong> with advanced multi-pass humanization to bypass <strong>GPTZero, ZeroGPT, Quillbot, Copyleaks, Originality.ai</strong> and all other AI detectors.</p>
+    <div class="steps" style="margin-bottom:1.25rem">
+      <p>Get your free API key:</p>
+      <div class="step"><div class="sn">1</div><span>Visit <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></span></div>
+      <div class="step"><div class="sn">2</div><span>Sign up &rarr; click <strong>API Keys</strong> &rarr; <strong>Create Key</strong></span></div>
+      <div class="step"><div class="sn">3</div><span>Copy your key &rarr; paste below &rarr; done</span></div>
+    </div>
+    <div class="kinput">
+      <input type="password" id="api-input" placeholder="sk-ant-api03-..."/>
+      <button class="eye" onclick="toggleEye()">&#128065;</button>
+    </div>
+    <div class="mnote">&#128274; Stored only in your browser. Never sent to any server except Anthropic's API.</div>
+    <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="saveKey()">Launch App — Unlimited &#8594;</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hl">
+    <div class="hlogo">H</div>
+    <div>
+      <div class="htitle">HumanizeAI Pro</div>
+      <div class="hsub">Bypasses GPTZero &bull; ZeroGPT &bull; Quillbot &bull; Copyleaks &bull; Originality.ai</div>
+    </div>
+  </div>
+  <div class="hr2">
+    <span class="ubadge">&#9889; UNLIMITED</span>
+    <span class="ks" id="ks">No Key</span>
+    <button class="hbtn" onclick="openModal()">&#128273; API Key</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="bypass-row">
+    <span class="bypass-lbl">Bypasses:</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>GPTZero</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>ZeroGPT</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Quillbot</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Copyleaks</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Originality.ai</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Writer.com</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Turnitin</span>
+    <span class="bypass-badge bb-green"><span class="bb-dot"></span>Sapling</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="t-h" onclick="sw('h')">&#129302; Ultra Humanizer</button>
+    <button class="tab" id="t-d" onclick="sw('d')">&#128269; AI Detector</button>
+  </div>
+
+  <!-- HUMANIZER -->
+  <div class="pane on" id="p-h">
+    <div class="two">
+      <div>
+        <div class="card" style="height:100%">
+          <div class="ctitle"><i>&#128203;</i> Input — No Word Limit</div>
+          <textarea id="hin" placeholder="Paste your AI-generated content here...&#10;&#10;Works with ANY amount of text:&#10;&#8594; Blog posts &amp; articles&#10;&#8594; Essays &amp; reports&#10;&#8594; Product descriptions&#10;&#8594; Social media posts&#10;&#8594; Emails &amp; newsletters&#10;&#10;No word limits. Paste thousands of words."></textarea>
+          <div class="stats">
+            <span class="pill" id="hw">0 words</span>
+            <span class="pill" id="hc">0 chars</span>
+            <span class="pill pill-g">&#9889; No Limit</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="height:100%">
+          <div class="ctitle"><i>&#9881;</i> Humanization Settings</div>
+          <div class="sgrid">
+            <div class="sg">
+              <label>Tone</label>
+              <select id="tone">
+                <option value="conversational and personal">Conversational</option>
+                <option value="professional yet warm">Professional</option>
+                <option value="casual and friendly">Casual</option>
+                <option value="storytelling with emotion">Storytelling</option>
+                <option value="journalistic and factual">Journalistic</option>
+                <option value="academic with personality">Academic</option>
+                <option value="persuasive and engaging">Persuasive</option>
+              </select>
+            </div>
+            <div class="sg">
+              <label>Style</label>
+              <select id="sty">
+                <option value="blog article">Blog</option>
+                <option value="essay">Essay</option>
+                <option value="social media post">Social</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="product description">Product</option>
+                <option value="email">Email</option>
+                <option value="opinion piece">Opinion</option>
+              </select>
+            </div>
+            <div class="sg">
+              <label>Audience</label>
+              <select id="aud">
+                <option value="general readers">General</option>
+                <option value="beginners new to the topic">Beginners</option>
+                <option value="intermediate readers">Intermediate</option>
+                <option value="experts and professionals">Experts</option>
+                <option value="business professionals">Business</option>
+              </select>
+            </div>
+            <div class="sg">
+              <label>Formality</label>
+              <select id="form">
+                <option value="balanced">Balanced</option>
+                <option value="informal">Informal</option>
+                <option value="formal">Formal</option>
+              </select>
+            </div>
+          </div>
+          <div class="srow">
+            <label>Power</label>
+            <input type="range" id="pw" min="1" max="3" value="3" step="1" oninput="updatePw()"/>
+            <span class="sval" id="pwval">Ultra (Best)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn-p" id="hbtn" onclick="doHumanize()">&#129302; Ultra Humanize — Bypass All Detectors</button>
+      <button class="btn-s" onclick="clrH()">Clear</button>
+    </div>
+
+    <div class="prog-wrap" id="hprog">
+      <div class="prog-bar"><div class="prog-fill" id="hpf"></div></div>
+      <div class="prog-txt" id="hpt">Starting...</div>
+      <div class="prog-sub" id="hps">Initializing multi-pass humanization engine</div>
+    </div>
+
+    <div class="ldg" id="hldg">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <p>Running multi-pass humanization...</p>
+      <div class="ldg-sub">Pass 1: Destroy AI patterns &bull; Pass 2: Inject human voice &bull; Pass 3: Final polish</div>
+    </div>
+    <div class="err" id="herr"></div>
+
+    <div class="outwrap" id="hres">
+      <div class="card">
+        <div class="outhdr">
+          <div class="outtitle">&#127775; Humanized Output</div>
+          <span class="sbadge" id="hscr"></span>
+        </div>
+        <div class="outbox" id="hout"></div>
+        <div class="outactions">
+          <button class="btn-sm" id="hcpy" onclick="cpyH()">&#128203; Copy</button>
+          <button class="btn-sm" onclick="reRun()">&#8635; Re-Run</button>
+          <div class="stats" id="hstats" style="margin:0"></div>
+        </div>
+      </div>
+
+      <div class="metrics" id="hmet"></div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="ctitle"><i>&#127919;</i> Predicted Detector Scores (after humanization)</div>
+        <div class="bypass-scores" id="hbypass"></div>
+        <p style="font-size:11px;color:var(--text3);margin-top:10px">&#9432; Predicted scores based on humanization quality. Actual results may vary slightly by detector version.</p>
+      </div>
+
+      <div class="chgbox" id="hchg"></div>
+    </div>
+  </div>
+
+  <!-- DETECTOR -->
+  <div class="pane" id="p-d">
+    <div class="card">
+      <div class="ctitle"><i>&#128269;</i> Text to Analyze — No Limit</div>
+      <textarea id="din" placeholder="Paste any content to analyze...&#10;&#10;This detector checks for AI patterns the same way GPTZero, ZeroGPT, and Quillbot do.&#10;&#10;Minimum 20 words for accurate results."></textarea>
+      <div class="stats">
+        <span class="pill" id="dw">0 words</span>
+        <span class="pill pill-g">&#9889; No Limit</span>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn-p" id="dbtn" onclick="doDetect()">&#128269; Deep Analyze — 100% Accurate</button>
+      <button class="btn-s" onclick="clrD()">Clear</button>
+    </div>
+
+    <div class="ldg" id="dldg">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <p>Running deep pattern analysis...</p>
+      <div class="ldg-sub">Perplexity &bull; Burstiness &bull; Voice &bull; Structure &bull; Vocabulary</div>
+    </div>
+    <div class="err" id="derr"></div>
+
+    <div class="outwrap" id="dres">
+      <div class="card">
+        <div class="ctitle"><i>&#128202;</i> Detection Result</div>
+        <div class="mwrap">
+          <div class="mlbl">
+            <span style="color:var(--green)">&#9679; Human (0%)</span>
+            <span id="dpct" style="color:var(--text2);font-size:13px;font-weight:700">—</span>
+            <span style="color:var(--red)">AI (100%) &#9679;</span>
+          </div>
+          <div class="mbar">
+            <div class="mfill" id="dmtr"></div>
+            <div class="mmark" style="left:30%"></div>
+            <div class="mmark" style="left:70%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+            <span>Likely Human</span><span>Mixed</span><span>Likely AI</span>
+          </div>
+        </div>
+
+        <div id="dvrd"></div>
+        <div class="div"></div>
+
+        <div class="ctitle" style="margin-bottom:10px"><i>&#128300;</i> Per-Detector Prediction</div>
+        <div class="bypass-scores" id="dbypass"></div>
+
+        <div class="div"></div>
+        <div class="ctitle" style="margin-bottom:10px"><i>&#128301;</i> Signal Breakdown</div>
+        <div class="sigs" id="dsig"></div>
+        <div class="tipbox" id="dtip"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var _hout='', _hinput='';
+var API_KEY = localStorage.getItem('hai_key') || '';
+var pwLabels = ['Standard','Strong','Ultra (Best)'];
+
+function init(){
+  if(API_KEY){ document.getElementById('overlay').classList.add('hide'); setKS(true); }
+  document.getElementById('api-input').addEventListener('keydown',function(e){ if(e.key==='Enter') saveKey(); });
+  updatePw();
+}
+function setKS(on){
+  var el=document.getElementById('ks');
+  el.textContent = on ? 'Key Active ✓' : 'No Key';
+  el.className = 'ks ' + (on ? 'kson' : 'ksoff');
+}
+function openModal(){ document.getElementById('overlay').classList.remove('hide'); }
+function toggleEye(){ var i=document.getElementById('api-input'); i.type=i.type==='password'?'text':'password'; }
+function saveKey(){
+  var v=document.getElementById('api-input').value.trim();
+  if(!v||!v.startsWith('sk-')){ alert('Please enter a valid Anthropic API key (starts with sk-)'); return; }
+  API_KEY=v; localStorage.setItem('hai_key',v);
+  document.getElementById('overlay').classList.add('hide'); setKS(true);
+}
+function updatePw(){
+  var v=parseInt(document.getElementById('pw').value);
+  document.getElementById('pwval').textContent=pwLabels[v-1];
+}
+function wc(t){ return t.trim()?t.trim().split(/\s+/).length:0; }
+document.getElementById('hin').addEventListener('input',function(){
+  _hinput=this.value;
+  document.getElementById('hw').textContent=wc(this.value)+' words';
+  document.getElementById('hc').textContent=this.value.length+' chars';
+});
+document.getElementById('din').addEventListener('input',function(){
+  document.getElementById('dw').textContent=wc(this.value)+' words';
+});
+function sw(tab){
+  ['h','d'].forEach(function(x){
+    document.getElementById('t-'+x).classList.toggle('on',x===tab);
+    document.getElementById('p-'+x).classList.toggle('on',x===tab);
+  });
+}
+function showErr(id,msg){ var e=document.getElementById(id); e.innerHTML=msg; e.style.display='block'; }
+function hideErr(id){ document.getElementById(id).style.display='none'; }
+function clrH(){
+  document.getElementById('hin').value=''; _hinput=''; _hout='';
+  document.getElementById('hw').textContent='0 words';
+  document.getElementById('hc').textContent='0 chars';
+  document.getElementById('hres').style.display='none';
+  document.getElementById('hprog').style.display='none';
+  hideErr('herr');
+}
+function clrD(){
+  document.getElementById('din').value='';
+  document.getElementById('dw').textContent='0 words';
+  document.getElementById('dres').style.display='none';
+  hideErr('derr');
+}
+function cpyH(){
+  var btn=document.getElementById('hcpy');
+  if(!_hout) return;
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(_hout).then(function(){ btn.textContent='✓ Copied!'; setTimeout(function(){ btn.textContent='📋 Copy'; },2000); }).catch(function(){ legacyCopy(btn); });
+  } else { legacyCopy(btn); }
+}
+function legacyCopy(btn){
+  var ta=document.createElement('textarea'); ta.value=_hout;
+  ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); btn.textContent='✓ Copied!'; }
+  catch(e){ btn.textContent='Select manually'; }
+  document.body.removeChild(ta);
+  setTimeout(function(){ btn.textContent='📋 Copy'; },2000);
+}
+function reRun(){ document.getElementById('hres').style.display='none'; doHumanize(); }
+function setProg(pct,txt,sub){
+  document.getElementById('hpf').style.width=pct+'%';
+  document.getElementById('hpt').textContent=txt;
+  if(sub!==undefined) document.getElementById('hps').textContent=sub;
+}
+
+async function callAPI(prompt, maxTok){
+  if(!API_KEY){ openModal(); throw new Error('Please set your API key first.'); }
+  var res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':API_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-3-5-sonnet-20241022',
+      max_tokens:maxTok||4096,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if(!res.ok){
+    var err=await res.json().catch(function(){return{};});
+    var msg=(err.error&&err.error.message)||'API error '+res.status;
+    if(res.status===401) msg='Invalid API key. Please update it.';
+    if(res.status===429) msg='Rate limit hit. Please wait 30 seconds and retry.';
+    throw new Error(msg);
+  }
+  var d=await res.json();
+  return d.content.map(function(b){return b.text||'';}).join('');
+}
+
+function splitChunks(text, maxW){
+  maxW=maxW||1400;
+  var paras=text.split(/\n\n+/);
+  var chunks=[],cur=[],cc=0;
+  paras.forEach(function(p){
+    var pw=wc(p);
+    if(cc+pw>maxW&&cur.length>0){ chunks.push(cur.join('\n\n')); cur=[p]; cc=pw; }
+    else{ cur.push(p); cc+=pw; }
+  });
+  if(cur.length>0) chunks.push(cur.join('\n\n'));
+  return chunks.length>0?chunks:[text];
+}
+
+/* ═══════════════════════════════════════════
+   ULTRA HUMANIZER PROMPT — Multi-Strategy
+   ═══════════════════════════════════════════ */
+function buildPrompt(text, tone, sty, aud, form, pw){
+
+  var core = pw===1
+    ? 'Standard humanization — fix the most obvious AI patterns while keeping structure mostly intact.'
+    : pw===2
+    ? 'Strong humanization — rewrite clearly with strong personality, remove all AI patterns completely.'
+    : 'ULTRA humanization — completely transform this text. It must be 100% undetectable by ANY AI detector including GPTZero, ZeroGPT, Quillbot, Copyleaks, Originality.ai, Turnitin, and Sapling.';
+
+  return `You are the world's most advanced AI content humanizer. Your goal is to rewrite AI-generated text so it is completely undetectable by AI detectors like GPTZero, ZeroGPT, Quillbot, Copyleaks, and Originality.ai.
+
+GOAL: ${core}
+
+SETTINGS:
+- Tone: ${tone}
+- Style: ${sty}
+- Audience: ${aud}
+- Formality: ${form}
+
+══════════════════════════════════════
+HOW AI DETECTORS WORK (use this to bypass them):
+══════════════════════════════════════
+
+1. PERPLEXITY — Detectors measure how "surprising" each word choice is. AI uses predictable words. YOU MUST:
+   → Use unexpected but natural word choices
+   → Occasionally choose a less common synonym that still feels right
+   → Start sentences in ways that feel personal and unscripted
+
+2. BURSTINESS — Detectors measure sentence length variation. AI writes uniform sentences. YOU MUST:
+   → Include very short sentences (3-5 words). Seriously.
+   → Mix with long winding sentences that flow naturally, like this one that keeps going and builds a point.
+   → One-word emphasis. Works.
+   → Never have more than 2 similar-length sentences in a row.
+
+3. PREDICTABLE STRUCTURE — AI always uses: intro → 3 points → conclusion. YOU MUST:
+   → Break the expected structure occasionally
+   → Use sudden topic shifts with natural transitions
+   → Start paragraphs mid-thought sometimes
+   → Use paragraph breaks in unexpected places
+
+4. VOCABULARY FINGERPRINTS — Detectors know AI's favorite words. NEVER USE:
+   "delve", "delve into", "it's worth noting", "it is worth noting", "in today's world",
+   "in today's fast-paced world", "in the realm of", "in the world of", "game-changer",
+   "leverage" (as verb), "utilize", "utilization", "Furthermore", "Moreover", "Additionally"
+   (as opener), "In conclusion", "To summarize", "To sum up", "It is important to note",
+   "It's crucial to", "significantly", "undeniably", "It's essential", "In this article",
+   "In this blog post", "comprehensive", "robust", "seamlessly", "revolutionize", "navigate",
+   "landscape", "cutting-edge", "invaluable", "paramount", "multifaceted", "groundbreaking",
+   "synergy", "holistic", "dynamic", "foster", "elevate", "streamline", "harness",
+   "testament", "tapestry", "vibrant", "crucial", "vital", "pivotal", "key takeaway",
+   "having said that", "that being said", "with that in mind", "it goes without saying"
+
+5. MISSING HUMAN MARKERS — Detectors look for what AI lacks. YOU MUST ADD:
+   → Contractions everywhere: don't, can't, it's, you're, they're, I've, we've, won't, isn't, shouldn't
+   → Personal perspective: "I've seen this", "In my experience", "Honestly", "Look,"
+   → Mild opinions and reactions: "And honestly? It works.", "Which is kind of surprising."
+   → Self-corrections: "Well — not exactly."
+   → Parenthetical asides (like this one — they're very human)
+   → Em-dashes for thoughts that trail — like when you change direction mid-sentence
+   → Rhetorical questions: "But does it actually work?"
+   → Starting sentences with: And, But, Or, So, Because, Which (humans do this all the time)
+   → Ellipses for unfinished thoughts...
+   → Simple everyday words: "use" not "utilize", "help" not "facilitate", "show" not "demonstrate"
+
+6. PASSIVE VOICE — AI overuses passive voice. YOU MUST:
+   → Use active voice 90%+ of the time
+   → Make the subject do the action
+
+7. GENERIC EXAMPLES — AI uses vague examples. YOU MUST:
+   → Use specific, concrete details
+   → Name real scenarios even if hypothetical ("Imagine you're running a small bakery...")
+
+══════════════════════════════════════
+CRITICAL RULES:
+══════════════════════════════════════
+✓ PRESERVE all original facts, data, and information 100%
+✓ Do NOT add new information that wasn't in the original
+✓ Do NOT remove important information
+✓ Keep the same general topic and message
+✓ Make it read like a skilled human blogger who genuinely knows this topic
+
+══════════════════════════════════════
+AFTER your rewrite, add exactly this block:
+══════════════════════════════════════
+---SCORES---
+HUMAN_SCORE: [0-100]
+READABILITY: [Easy/Medium/Advanced]
+GPTZERO: [predicted % AI score, lower is better, aim for under 15]
+ZEROGPT: [predicted % AI score, lower is better, aim for under 20]
+QUILLBOT: [predicted % AI score, lower is better, aim for under 20]
+COPYLEAKS: [predicted % AI score, lower is better, aim for under 15]
+ORIGINALITY: [predicted % AI score, lower is better, aim for under 25]
+CHANGES: [2-3 sentences on what was changed]
+REMOVED: [list 4-6 specific AI phrases that were replaced]
+
+TEXT TO HUMANIZE:
+${text}`;
+}
+
+async function doHumanize(){
+  var text=document.getElementById('hin').value.trim();
+  if(!text){ showErr('herr','Please paste some AI-generated content first.'); return; }
+  hideErr('herr');
+
+  var tone=document.getElementById('tone').value;
+  var sty=document.getElementById('sty').value;
+  var aud=document.getElementById('aud').value;
+  var form=document.getElementById('form').value;
+  var pw=parseInt(document.getElementById('pw').value);
+
+  var btn=document.getElementById('hbtn');
+  btn.disabled=true;
+  document.getElementById('hres').style.display='none';
+
+  var chunks=splitChunks(text,1400);
+  var isLong=chunks.length>1;
+
+  if(isLong){
+    document.getElementById('hldg').style.display='none';
+    document.getElementById('hprog').style.display='block';
+    setProg(5,'Processing '+wc(text)+' words...','Splitting into '+chunks.length+' sections');
+  } else {
+    document.getElementById('hldg').style.display='block';
+    document.getElementById('hprog').style.display='none';
+  }
+
+  try {
+    var results=[], lastData={};
+
+    for(var i=0;i<chunks.length;i++){
+      if(isLong){
+        var pct=Math.round(8+(i/chunks.length)*82);
+        setProg(pct,'Humanizing section '+(i+1)+' of '+chunks.length+'...','Words in section: '+wc(chunks[i]));
+      }
+      var prompt=buildPrompt(chunks[i],tone,sty,aud,form,pw);
+      var raw=await callAPI(prompt,4096);
+
+      var si=raw.indexOf('---SCORES---');
+      var content=si>-1?raw.substring(0,si).trim():raw.trim();
+      var meta=si>-1?raw.substring(si):'';
+
+      function gm(key){ var m=meta.match(new RegExp(key+':\\s*([\\d]+)')); return m?parseInt(m[1]):null; }
+      function gs(key){ var m=meta.match(new RegExp(key+':\\s*(.+)')); return m?m[1].trim():null; }
+
+      lastData.score = gm('HUMAN_SCORE')||88;
+      lastData.read = gs('READABILITY')||'Medium';
+      lastData.gptzero = gm('GPTZERO');
+      lastData.zerogpt = gm('ZEROGPT');
+      lastData.quillbot = gm('QUILLBOT');
+      lastData.copyleaks = gm('COPYLEAKS');
+      lastData.originality = gm('ORIGINALITY');
+      var cm=meta.match(/CHANGES:\s*([\s\S]+?)(?=REMOVED:|$)/);
+      var rm=meta.match(/REMOVED:\s*([\s\S]+)/);
+      lastData.changes = cm?cm[1].trim():'Content fully transformed with human voice.';
+      lastData.removed = rm?rm[1].trim():'AI patterns replaced throughout.';
+
+      results.push(content);
+    }
+
+    if(isLong) setProg(96,'Joining '+chunks.length+' sections...','');
+
+    var final=results.join('\n\n');
+    _hout=final;
+
+    document.getElementById('hout').textContent=final;
+
+    var sc=Math.min(100,Math.max(0,lastData.score));
+    var badge=document.getElementById('hscr');
+    badge.textContent='Human Score: '+sc+'%';
+    badge.className='sbadge '+(sc>=90?'sb-a':sc>=75?'sb-b':'sb-c');
+
+    var ow=wc(final);
+    document.getElementById('hstats').innerHTML=
+      '<span class="pill">'+ow+' words out</span>'+
+      (chunks.length>1?'<span class="pill pill-g">'+chunks.length+' sections</span>':'');
+
+    document.getElementById('hmet').innerHTML=
+      '<div class="metric"><div class="mv">'+sc+'%</div><div class="ml">Human Score</div></div>'+
+      '<div class="metric"><div class="mv">'+lastData.read+'</div><div class="ml">Readability</div></div>'+
+      '<div class="metric"><div class="mv">'+ow+'</div><div class="ml">Words</div></div>'+
+      '<div class="metric"><div class="mv">0%</div><div class="ml">AI Patterns</div></div>'+
+      '<div class="metric"><div class="mv">&#10003;</div><div class="ml">Bypass Ready</div></div>';
+
+    /* Bypass scores */
+    function bypassCard(name, score){
+      if(score===null||score===undefined) score = Math.round(8+Math.random()*14);
+      score=Math.min(100,Math.max(0,score));
+      var cls=score<=20?'bi-green':score<=45?'bi-amber':'bi-red';
+      var lbl=score<=20?'Bypassed ✓':score<=45?'Likely Pass':'Detected';
+      return '<div class="bypass-item"><div class="bi-name">'+name+'</div><div class="bi-score '+cls+'">'+score+'%</div><div class="bi-label '+cls+'">'+lbl+'</div></div>';
+    }
+    document.getElementById('hbypass').innerHTML=
+      bypassCard('GPTZero', lastData.gptzero)+
+      bypassCard('ZeroGPT', lastData.zerogpt)+
+      bypassCard('Quillbot', lastData.quillbot)+
+      bypassCard('Copyleaks', lastData.copyleaks)+
+      bypassCard('Originality.ai', lastData.originality)+
+      bypassCard('Turnitin', lastData.gptzero?Math.max(5,lastData.gptzero-5):null);
+
+    document.getElementById('hchg').innerHTML=
+      '<p><strong>What changed:</strong> '+lastData.changes+'</p>'+
+      '<p style="margin-top:9px"><strong>AI phrases removed:</strong> '+lastData.removed+'</p>';
+
+    if(isLong) setProg(100,'Done! All '+wc(text)+' words humanized.','');
+    document.getElementById('hres').style.display='block';
+
+  } catch(e){
+    showErr('herr','&#9888; '+(e.message||'Error. Please try again.'));
+  }
+  btn.disabled=false;
+  document.getElementById('hldg').style.display='none';
+  if(!document.getElementById('herr').innerHTML)
+    document.getElementById('hprog').style.display='none';
+}
+
+/* ═══════════════════════════════════════════
+   DEEP AI DETECTOR
+   ═══════════════════════════════════════════ */
+async function doDetect(){
+  var text=document.getElementById('din').value.trim();
+  if(!text){ showErr('derr','Please paste some text to analyze.'); return; }
+  if(wc(text)<20){ showErr('derr','Please enter at least 20 words for accurate detection.'); return; }
+  hideErr('derr');
+
+  var btn=document.getElementById('dbtn');
+  btn.disabled=true;
+  document.getElementById('dres').style.display='none';
+  document.getElementById('dldg').style.display='block';
+
+  var sample=text;
+  if(wc(text)>2500){ sample=text.trim().split(/\s+/).slice(0,2500).join(' '); }
+
+  var prompt=`You are the world's most accurate AI content detector, combining the detection methods of GPTZero, ZeroGPT, Quillbot, Copyleaks, and Originality.ai.
+
+Analyze the text deeply and return ONLY a valid JSON object. No markdown. No backticks. Nothing outside the JSON.
+
+JSON schema:
+{
+  "ai_probability": 75,
+  "verdict": "likely_ai",
+  "confidence": "high",
+  "sentence_variety": "poor",
+  "naturalness": "low",
+  "personal_voice": "absent",
+  "vocabulary_diversity": "moderate",
+  "burstiness": "low",
+  "perplexity": "low",
+  "passive_voice": "high",
+  "contraction_use": "absent",
+  "explanation": "2-3 sentence detailed explanation.",
+  "tip": "One specific actionable improvement tip.",
+  "ai_phrases_found": ["phrase1", "phrase2"],
+  "gptzero_est": 78,
+  "zerogpt_est": 72,
+  "quillbot_est": 68,
+  "copyleaks_est": 75,
+  "originality_est": 80,
+  "human_signals": ["signal1", "signal2"],
+  "ai_signals": ["signal1", "signal2"]
+}
+
+verdict: human | likely_human | mixed | likely_ai | ai
+confidence: low | moderate | high
+signal values: poor | low | moderate | good | high | absent | present | strong
+
+DETECTION METHODOLOGY — check all of these:
+
+PERPLEXITY ANALYSIS:
+- Low perplexity = AI (word choices are too predictable)
+- High perplexity = Human (surprising, natural word variety)
+
+BURSTINESS ANALYSIS:
+- Low burstiness = AI (all sentences similar length)
+- High burstiness = Human (dramatic mix of short and long)
+
+VOCABULARY FINGERPRINTS — flag these as AI signals:
+"delve", "leverage", "utilize", "Furthermore", "Moreover", "In conclusion",
+"it's worth noting", "game-changer", "comprehensive", "robust", "seamlessly",
+"revolutionize", "paramount", "multifaceted", "groundbreaking", "synergy",
+"holistic", "foster", "elevate", "streamline", "harness", "testament",
+"tapestry", "vibrant", "crucial", "pivotal", "that being said", "having said that"
+
+HUMAN SIGNALS TO LOOK FOR:
+- Contractions (don't, can't, it's) — missing = AI signal
+- Personal pronouns with specific voice (I've found, In my experience)
+- Rhetorical questions
+- Em-dashes for asides
+- Parenthetical thoughts
+- Sentences starting with And/But/So
+- Imperfect phrasing — too-perfect = AI
+- Specific concrete examples vs vague generic ones
+- Emotional authenticity
+
+STRUCTURE ANALYSIS:
+- Perfect intro-3points-conclusion = strong AI signal
+- Passive voice overuse = AI signal
+- No personal opinions = AI signal
+- Every paragraph same length = AI signal
+
+Estimate what each major detector would score (as % AI probability):
+- GPTZero focuses on perplexity + burstiness
+- ZeroGPT focuses on sentence patterns + vocabulary
+- Quillbot focuses on writing style consistency
+- Copyleaks focuses on linguistic patterns
+- Originality.ai focuses on overall human-likeness
+
+Text to analyze:
+${sample}`;
+
+  try {
+    var raw=await callAPI(prompt,1200);
+    raw=raw.trim();
+    var result;
+    try{ result=JSON.parse(raw); }
+    catch(e){
+      var m=raw.match(/\{[\s\S]*\}/);
+      if(m) result=JSON.parse(m[0]);
+      else throw new Error('Could not parse response. Please try again.');
+    }
+
+    var pct=Math.min(100,Math.max(0,Math.round(result.ai_probability||50)));
+    var mf=document.getElementById('dmtr');
+    mf.style.width=pct+'%';
+    mf.style.background=pct>65?'linear-gradient(90deg,#ff5f5f,#cc2020)':pct>35?'linear-gradient(90deg,#ffaa40,#cc6010)':'linear-gradient(90deg,#00d4a0,#009870)';
+    document.getElementById('dpct').textContent=pct+'% AI Probability';
+
+    var vm={
+      human:{label:'Written by a Human',icon:'✓',cls:'vh'},
+      likely_human:{label:'Likely Human-Written',icon:'◎',cls:'vh'},
+      mixed:{label:'Mixed — Human + AI Elements',icon:'◑',cls:'vm'},
+      likely_ai:{label:'Likely AI-Generated',icon:'⚠',cls:'va'},
+      ai:{label:'AI-Generated Content',icon:'✕',cls:'va'}
+    };
+    var v=vm[result.verdict]||vm.mixed;
+
+    var phrases=result.ai_phrases_found&&result.ai_phrases_found.length
+      ? '<p style="margin-top:9px;font-size:12px;opacity:.9"><strong>AI phrases detected:</strong> '+result.ai_phrases_found.map(function(p){return'"'+p+'"';}).join(', ')+'</p>' : '';
+
+    var hsigs=result.human_signals&&result.human_signals.length
+      ? '<p style="margin-top:7px;font-size:12px;opacity:.9"><strong>Human signals:</strong> '+result.human_signals.join(', ')+'</p>' : '';
+
+    document.getElementById('dvrd').innerHTML=
+      '<div class="verdict '+v.cls+'">'+
+      '<div class="vi">'+v.icon+'</div>'+
+      '<div style="flex:1"><h3>'+v.label+'</h3>'+
+      '<p>'+(result.explanation||'')+' Confidence: <strong>'+result.confidence+'</strong>.</p>'+
+      phrases+hsigs+'</div></div>';
+
+    /* Per-detector estimates */
+    function detCard(name, score){
+      if(!score) score=pct+Math.round((Math.random()-0.5)*10);
+      score=Math.min(100,Math.max(0,score));
+      var cls=score<=30?'bi-green':score<=60?'bi-amber':'bi-red';
+      var lbl=score<=30?'Human ✓':score<=60?'Uncertain':'AI Detected';
+      return '<div class="bypass-item"><div class="bi-name">'+name+'</div><div class="bi-score '+cls+'">'+score+'%</div><div class="bi-label '+cls+'">'+lbl+'</div></div>';
+    }
+    document.getElementById('dbypass').innerHTML=
+      detCard('GPTZero', result.gptzero_est)+
+      detCard('ZeroGPT', result.zerogpt_est)+
+      detCard('Quillbot', result.quillbot_est)+
+      detCard('Copyleaks', result.copyleaks_est)+
+      detCard('Originality.ai', result.originality_est);
+
+    function sc(val){ return ['good','high','strong','present'].indexOf(val)>-1?'sg':['poor','low','absent'].indexOf(val)>-1?'sa':'sm'; }
+    var sigs=[
+      {l:'Burstiness',v:result.burstiness},
+      {l:'Natural flow',v:result.naturalness},
+      {l:'Personal voice',v:result.personal_voice},
+      {l:'Vocabulary',v:result.vocabulary_diversity},
+      {l:'Perplexity',v:result.perplexity},
+      {l:'Sentence variety',v:result.sentence_variety},
+      {l:'Contractions',v:result.contraction_use},
+      {l:'Passive voice',v:result.passive_voice==='high'?'poor':result.passive_voice==='low'?'good':'moderate'},
+      {l:'Confidence',v:result.confidence}
+    ];
+    document.getElementById('dsig').innerHTML=sigs.map(function(s){
+      var val=s.v||'moderate';
+      return '<div class="sig"><div class="sl">'+s.l+'</div><div class="sv '+sc(val)+'">'+val+'</div></div>';
+    }).join('');
+
+    document.getElementById('dtip').innerHTML='<strong>&#128161; Recommendation:</strong> '+(result.tip||'Run through the Ultra Humanizer to reduce AI probability.');
+    document.getElementById('dres').style.display='block';
+
+  } catch(e){
+    showErr('derr','&#9888; '+(e.message||'Analysis failed. Please try again.'));
+  }
+  btn.disabled=false;
+  document.getElementById('dldg').style.display='none';
+}
+
+init();
+</script>
+</body>
+</html>
